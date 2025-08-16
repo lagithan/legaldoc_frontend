@@ -4,9 +4,6 @@ import {
   Home,
   FileText,
   BarChart3,
-  Upload,
-  HelpCircle,
-  Settings
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { ROUTES } from '../../utils/constants';

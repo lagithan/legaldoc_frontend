@@ -7,7 +7,7 @@ import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
 import { useDocuments } from '../hooks/useDocuments';
 import { useChat } from '../hooks/useChat';
-import { cn } from '../utils/cn';
+
 
 const Documents: React.FC = () => {
   const navigate = useNavigate();

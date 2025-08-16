@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { AlertCircle, Download } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import DocumentDetails from '../components/documents/DocumentDetails';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useDocuments } from '../hooks/useDocuments';
 import { useChat } from '../hooks/useChat';
 import { documentService } from '../services/documentService';
-import { downloadTextAsFile } from '../utils/helpers';
 
 const DocumentView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -80,29 +79,31 @@ const DocumentView: React.FC = () => {
       return;
     }
 
-    console.log('Starting export for document:', currentDocument.id);
+    console.log('Starting PDF export for document:', currentDocument.id);
     setExportLoading(true);
     setExportError(null);
     setExportSuccess(false);
 
     try {
-      console.log('Calling export service...');
-      const reportData = await documentService.exportReport(currentDocument.id);
-      console.log('Export service returned:', reportData);
+      console.log('Calling PDF export service...');
+      const pdfData = await documentService.exportReport(currentDocument.id);
+      console.log('PDF export service returned:', {
+        filename: pdfData.filename,
+        documentId: pdfData.document_id,
+        generatedAt: pdfData.generated_at,
+        blobSize: pdfData.blob.size
+      });
 
-      // Download the report
-      console.log('Starting download...');
-      downloadTextAsFile(
-        reportData.report,
-        reportData.filename
-      );
+      // Download the PDF using the service's download method
+      console.log('Starting PDF download...');
+      documentService.downloadPDF(pdfData.blob, pdfData.filename);
 
-      console.log('Report exported and downloaded successfully');
+      console.log('PDF report exported and downloaded successfully');
       setExportSuccess(true);
       setTimeout(() => setExportSuccess(false), 3000); // Hide success message after 3 seconds
     } catch (error: any) {
-      console.error('Export failed with error:', error);
-      setExportError(error.message || 'Failed to export report. Please try again.');
+      console.error('PDF export failed with error:', error);
+      setExportError(error.message || 'Failed to export PDF report. Please try again.');
     } finally {
       setExportLoading(false);
     }
@@ -181,7 +182,7 @@ const DocumentView: React.FC = () => {
                 {exportSuccess ? (
                   <>
                     <div className="w-4 h-4 text-green-600">✓</div>
-                    <span className="text-sm text-green-800">Report exported successfully!</span>
+                    <span className="text-sm text-green-800">PDF report exported successfully!</span>
                   </>
                 ) : (
                   <>
@@ -211,7 +212,7 @@ const DocumentView: React.FC = () => {
       {exportLoading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 shadow-lg">
-            <LoadingSpinner size="lg" text="Generating report..." />
+            <LoadingSpinner size="lg" text="Generating PDF report..." />
           </div>
         </div>
       )}

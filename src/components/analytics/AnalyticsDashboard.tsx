@@ -4,13 +4,11 @@ import {
   AlertTriangle,
   Brain,
   Shield,
-  TrendingUp,
   BarChart3
 } from 'lucide-react';
-import StatsCard, { MiniStatsCard } from './StatsCard';
-import RiskChart, { DonutChart } from './RiskChart';
+import StatsCard from './StatsCard';
 import Card, { CardHeader, CardTitle, CardContent } from '../common/Card';
-import LoadingSpinner, { Skeleton } from '../common/LoadingSpinner';
+import { Skeleton } from '../common/LoadingSpinner';
 import { cn } from '../../utils/cn';
 import { formatPercentage } from '../../utils/helpers';
 import type { AnalyticsResponse, LegalModelsStatus } from '../../types/document';
@@ -127,10 +125,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
 
   // Calculate risk level percentages
   const totalDocs = analytics.total_documents;
-  const riskPercentages = Object.entries(analytics.risk_distribution).reduce((acc, [key, value]) => {
-    acc[key] = totalDocs > 0 ? (value / totalDocs) * 100 : 0;
-    return acc;
-  }, {} as Record<string, number>);
+  
 
   // Get most common document type
   const mostCommonType = Object.entries(analytics.document_types).reduce((a, b) =>

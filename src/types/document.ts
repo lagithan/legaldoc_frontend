@@ -48,6 +48,21 @@ export interface LegalModelAnalysis {
   urgency_signals: string[];
 }
 
+// Add this interface to src/types/document.ts
+
+export interface LegalModelsStatus {
+  available_models: Record<string, {
+    model_id: string;
+    description: string;
+    size: string;
+    speed: string;
+  }>;
+  loaded_models: string[];
+  device: string;
+  total_models: number;
+  status: 'operational' | 'degraded';
+}
+
 export type DocumentType =
   | 'lease_agreement'
   | 'employment_contract'

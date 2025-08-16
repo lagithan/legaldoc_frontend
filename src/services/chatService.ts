@@ -37,7 +37,7 @@ export class ChatService {
   }
 
   // Generate follow-up questions based on context
-  generateFollowUpQuestions(context: string, currentQuestion: string): string[] {
+  generateFollowUpQuestions(): string[] {
     const followUps = [
       "Can you explain this in simpler terms?",
       "What are the specific consequences?",

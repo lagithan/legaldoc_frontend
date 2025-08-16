@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { documentService } from '../services/documentService';
-import type { DocumentResponse, DocumentsResponse, DocumentListItem } from '../types/document';
+import type { DocumentResponse, DocumentListItem } from '../types/document';
 
 export interface UseDocumentsReturn {
   documents: DocumentListItem[];

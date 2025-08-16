@@ -13,13 +13,10 @@ import {
 import Card, { CardHeader, CardTitle, CardContent } from '../common/Card';
 import Button from '../common/Button';
 import { RiskBadge, LawyerUrgencyBadge } from '../common/Badge';
-import RiskMeter from './RiskMeter';
 import { cn } from '../../utils/cn';
 import {
-  formatDate,
   getDocumentTypeLabel,
   formatConfidenceScore,
-  formatPercentage
 } from '../../utils/helpers';
 import type { DocumentResponse } from '../../types/document';
 import ChatAssistant from '../chat/ChatAssistant';
@@ -65,8 +62,7 @@ const DocumentDetails: React.FC<DocumentDetailsProps> = ({
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: FileText },
-    { id: 'analysis', label: 'AI Analysis', icon: Brain },
-    { id: 'risks', label: 'Risk Assessment', icon: AlertTriangle }
+    { id: 'analysis', label: 'AI Analysis', icon: Brain }
   ];
 
   return (
@@ -344,62 +340,7 @@ const DocumentDetails: React.FC<DocumentDetailsProps> = ({
           </>
         )}
 
-        {activeTab === 'risks' && (
-          <>
-            {/* Risk Meter */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Risk Assessment</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <RiskMeter
-                  riskScore={document.risk_score}
-                  riskBreakdown={document.risk_breakdown}
-                  showBreakdown={true}
-                  size="lg"
-                />
-              </CardContent>
-            </Card>
-
-            {/* Risk Indicators */}
-            {document.risk_indicators.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Risk Indicators Found</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {document.risk_indicators.map((indicator, index) => (
-                      <div key={index} className="flex items-center space-x-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                        <AlertTriangle className="w-5 h-5 text-orange-600 flex-shrink-0" />
-                        <span className="text-orange-800 capitalize">{indicator.replace('_', ' ')}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Urgency Signals */}
-            {document.urgency_signals.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Urgency Signals</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {document.urgency_signals.map((signal, index) => (
-                      <div key={index} className="flex items-center space-x-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                        <div className="text-lg">🚨</div>
-                        <span className="text-red-800 capitalize">{signal.replace('_', ' ')}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </>
-        )}
+        
       </div>
 
       {/* Suggested Questions */}

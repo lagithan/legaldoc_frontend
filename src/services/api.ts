@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { API_BASE_URL } from '../utils/constants';
-import type { ApiResponse, ApiError } from '../types/api';
+import type { ApiError } from '../types/api';
 
 class ApiClient {
   private client: AxiosInstance;

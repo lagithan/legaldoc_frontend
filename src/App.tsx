@@ -5,7 +5,6 @@ import Dashboard from './pages/Dashboard';
 import Documents from './pages/Documents';
 import DocumentView from './pages/DocumentView';
 import Analytics from './pages/Analytics';
-import { ROUTES } from './utils/constants';
 import './styles/globals.css';
 
 const App: React.FC = () => {

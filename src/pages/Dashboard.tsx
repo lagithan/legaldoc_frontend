@@ -12,14 +12,12 @@ import {
 import DocumentUpload from '../components/documents/DocumentUpload';
 import DocumentCard from '../components/documents/DocumentCard';
 import StatsCard from '../components/analytics/StatsCard';
-import RiskChart from '../components/analytics/RiskChart';
 import Card, { CardHeader, CardTitle, CardContent } from '../components/common/Card';
 import Button from '../components/common/Button';
-import LoadingSpinner, { Skeleton } from '../components/common/LoadingSpinner';
+import { Skeleton } from '../components/common/LoadingSpinner';
 import Modal from '../components/common/Modal';
 import { useDocuments } from '../hooks/useDocuments';
 import { useChat } from '../hooks/useChat';
-import { cn } from '../utils/cn';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -32,7 +30,6 @@ const Dashboard: React.FC = () => {
     uploading,
     uploadProgress,
     totalCount,
-    riskDistribution,
     uploadDocument,
     deleteDocument,
     clearError
@@ -43,8 +40,8 @@ const Dashboard: React.FC = () => {
   // Get recent documents (last 5)
   const recentDocuments = documents.slice(0, 5);
 
-  // Calculate quick stats
-  const highRiskCount = (riskDistribution.high || 0) + (riskDistribution.urgent || 0);
+  
+ 
   const avgRiskScore = documents.length > 0
     ? documents.reduce((sum, doc) => sum + doc.risk_score, 0) / documents.length
     : 0;

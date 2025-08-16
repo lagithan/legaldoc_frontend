@@ -121,7 +121,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
       {/* SVG Chart */}
       <div className="relative" style={{ width: size, height: size }}>
         <svg width={size} height={size} className="transform -rotate-90">
-          {Object.entries(data).map(([key, value], index) => {
+          {Object.entries(data).map(([key, value]) => {
             if (value === 0) return null;
 
             const percentage = value / total;

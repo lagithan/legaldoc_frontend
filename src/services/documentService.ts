@@ -1,10 +1,12 @@
 import apiClient from './api';
+import jsPDF from 'jspdf';
 import type {
   DocumentResponse,
   DocumentsResponse,
   AnalyticsResponse,
   LegalModelsStatus
 } from '../types/document';
+import { getDocumentTypeLabel } from '@/utils/helpers';
 
 export class DocumentService {
   // Upload document
@@ -49,98 +51,209 @@ export class DocumentService {
     return apiClient.get<LegalModelsStatus>('/legal-models/status');
   }
 
-  // Export comprehensive report
+  // Export comprehensive report as PDF
   async exportReport(documentId: string): Promise<{
-    report: string;
+    blob: Blob;
     filename: string;
     document_id: string;
     generated_at: string;
   }> {
-    console.log('DocumentService: Starting export for document:', documentId);
+    console.log('DocumentService: Starting PDF export for document:', documentId);
 
     try {
-      console.log('DocumentService: Attempting backend export endpoint');
-      const result = await apiClient.get(`/export-report/${documentId}`);
-      console.log('DocumentService: Backend export successful');
-      return result;
-    } catch (error: any) {
-      // If the export endpoint doesn't exist, generate a basic report
-      console.warn('DocumentService: Export endpoint not available, generating fallback report. Error:', error.message);
+      // Get document details for report generation
+      console.log('DocumentService: Fetching document details for PDF report');
+      const document = await this.getDocument(documentId);
+      const now = new Date().toISOString();
 
-      try {
-        // Get document details for basic report
-        console.log('DocumentService: Fetching document details for fallback report');
-        const document = await this.getDocument(documentId);
-        const now = new Date().toISOString();
+      console.log('DocumentService: Generating PDF report');
 
-        console.log('DocumentService: Generating fallback report content');
-        const basicReport = `
-LEGAL DOCUMENT ANALYSIS REPORT
-=============================
+      // Create new PDF document
+      const pdf = new jsPDF();
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const maxWidth = pageWidth - (margin * 2);
+      let yPosition = margin;
 
-Document: ${document.filename}
-Generated: ${new Date().toLocaleString()}
-Document ID: ${documentId}
+      // Helper function to check if we need a new page
+      const checkNewPage = (requiredHeight: number) => {
+        if (yPosition + requiredHeight > pageHeight - margin) {
+          pdf.addPage();
+          yPosition = margin;
+        }
+      };
 
-EXECUTIVE SUMMARY
-${document.summary}
+      // Helper function to add text with word wrapping
+      const addWrappedText = (text: string, fontSize: number = 12, isBold: boolean = false, indent: number = 0) => {
+        pdf.setFontSize(fontSize);
+        if (isBold) {
+          pdf.setFont('helvetica', 'bold');
+        } else {
+          pdf.setFont('helvetica', 'normal');
+        }
 
-KEY TERMS & OBLIGATIONS
-${document.key_clauses.map((clause, i) => `${i + 1}. ${clause}`).join('\n')}
+        const textWidth = maxWidth - indent;
+        const lines = pdf.splitTextToSize(text, textWidth);
+        const lineHeight = fontSize * 0.35; // Much tighter line spacing
+        const totalHeight = lines.length * lineHeight + 3; // Minimal spacing after text
+        
+        // Check if we need a new page
+        checkNewPage(totalHeight);
 
-RED FLAGS & CONCERNS
-${document.red_flags.map((flag, i) => `⚠️ ${i + 1}. ${flag}`).join('\n')}
+        pdf.text(lines, margin + indent, yPosition);
+        yPosition += totalHeight;
+      };
 
-RISK ASSESSMENT
-Overall Risk Score: ${Math.round(document.risk_score * 100)}%
-AI Confidence: ${Math.round(document.confidence_score * 100)}%
-Lawyer Consultation: ${document.lawyer_recommendation ? 'Recommended' : 'Not Required'}
-Urgency Level: ${document.lawyer_urgency}
+      // Improved helper function to add list items with proper formatting
+      const addListItem = (text: string, index: number, fontSize: number = 12) => {
+        const indent = 10; // Consistent left alignment
+        
+        pdf.setFontSize(fontSize);
+        pdf.setFont('helvetica', 'normal');
+        
+        const numberedText = `${index}. ${text}`;
+        const textWidth = maxWidth - indent;
+        const lines = pdf.splitTextToSize(numberedText, textWidth);
+        const lineHeight = fontSize * 0.35; // Tight line height matching text
+        const totalHeight = lines.length * lineHeight + 4; // Minimal spacing between items
+        
+        // Check if we need a new page
+        checkNewPage(totalHeight);
 
-LEGAL ANALYSIS REASONING
-${document.ai_confidence_reasoning}
+        // Add the text with consistent left alignment
+        pdf.text(lines, margin + indent, yPosition);
+        yPosition += totalHeight;
+      };
 
-RISK BREAKDOWN
-Financial Risk: ${Math.round(document.risk_breakdown.financial_risk * 100)}%
-Termination Risk: ${Math.round(document.risk_breakdown.termination_risk * 100)}%
-Liability Risk: ${Math.round(document.risk_breakdown.liability_risk * 100)}%
-Renewal Risk: ${Math.round(document.risk_breakdown.renewal_risk * 100)}%
-Modification Risk: ${Math.round(document.risk_breakdown.modification_risk * 100)}%
+      // Helper function to add section spacing
+      const addSection = (spacing: number = 8) => {
+        yPosition += spacing;
+        checkNewPage(spacing);
+      };
 
-LEGAL TERMINOLOGY DETECTED
-${document.legal_terminology_found.join(', ')}
+      // Helper function to add a horizontal line
+      const addHorizontalLine = () => {
+        checkNewPage(15);
+        pdf.setDrawColor(0);
+        pdf.setLineWidth(0.5);
+        pdf.line(margin, yPosition, pageWidth - margin, yPosition);
+        yPosition += 10;
+      };
 
-RISK INDICATORS FOUND
-${document.risk_indicators.join(', ')}
+      // Title
+      addWrappedText('LEGAL DOCUMENT ANALYSIS REPORT', 18, true);
+      addHorizontalLine();
 
-${document.urgency_signals.length > 0 ? `
-URGENCY SIGNALS
-${document.urgency_signals.join(', ')}
-` : ''}
+      // Document info - more compact
+      addWrappedText(`Document: ${document.filename}`, 12, true);
+      addWrappedText(`Generated: ${new Date().toLocaleString()}`);
+      addWrappedText(`Document Type : ${getDocumentTypeLabel(document.document_type)}`);
+      addSection(10);
 
-SUGGESTED QUESTIONS
-${document.suggested_questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
+      // Executive Summary
+      addWrappedText('EXECUTIVE SUMMARY', 14, true);
+      addWrappedText(document.summary);
+      addSection(10);
 
----
-Generated by AI Legal Doc Explainer v8.0.0
-Legal AI System powered by Legal-BERT and Gemini AI
-Report generated on ${new Date().toLocaleString()}
-        `.trim();
-
-        const result = {
-          report: basicReport,
-          filename: `legal_analysis_${document.filename.replace('.pdf', '')}_${new Date().toISOString().split('T')[0]}.txt`,
-          document_id: documentId,
-          generated_at: now
-        };
-
-        console.log('DocumentService: Fallback report generated successfully');
-        return result;
-      } catch (fallbackError: any) {
-        console.error('DocumentService: Fallback report generation failed:', fallbackError);
-        throw new Error(`Export failed: ${fallbackError.message}`);
+      // Key Terms & Obligations
+      addWrappedText('KEY TERMS & OBLIGATIONS', 14, true);
+      if (document.key_clauses && document.key_clauses.length > 0) {
+        document.key_clauses.forEach((clause, i) => {
+          addListItem(clause, i + 1);
+        });
+      } else {
+        addWrappedText('No key clauses identified.');
       }
+      addSection(10);
+
+      // Red Flags & Concerns - FIXED SECTION
+      addWrappedText('RED FLAGS & CONCERNS', 14, true);
+      if (document.red_flags && document.red_flags.length > 0) {
+        document.red_flags.forEach((flag, i) => {
+          // Clean the text and ensure proper formatting
+          const cleanFlag = flag.trim();
+          addListItem(cleanFlag, i + 1);
+        });
+      } else {
+        addWrappedText('No red flags identified.');
+      }
+      addSection(10);
+
+      // Legal Terminology
+      addWrappedText('LEGAL TERMINOLOGY DETECTED', 14, true);
+      if (document.legal_terminology_found && document.legal_terminology_found.length > 0) {
+        const terminologyText = document.legal_terminology_found.join(', ');
+        addWrappedText(terminologyText);
+      } else {
+        addWrappedText('No specific legal terminology detected.');
+      }
+      addSection(10);
+
+      // Risk Indicators
+      addWrappedText('RISK INDICATORS FOUND', 14, true);
+      if (document.risk_indicators && document.risk_indicators.length > 0) {
+        const indicatorsText = document.risk_indicators.join(', ');
+        addWrappedText(indicatorsText);
+      } else {
+        addWrappedText('No specific risk indicators found.');
+      }
+      addSection(10);
+
+      // Urgency Signals (if any)
+      if (document.urgency_signals && document.urgency_signals.length > 0) {
+        addWrappedText('URGENCY SIGNALS', 14, true);
+        addWrappedText(document.urgency_signals.join(', '));
+        addSection(10);
+      }
+
+      // Suggested Questions
+      addWrappedText('SUGGESTED QUESTIONS', 14, true);
+      if (document.suggested_questions && document.suggested_questions.length > 0) {
+        document.suggested_questions.forEach((question, i) => {
+          addListItem(question, i + 1);
+        });
+      } else {
+        addWrappedText('No suggested questions available.');
+      }
+      addSection(10);
+
+      // Footer
+      addSection(20);
+      addHorizontalLine();
+      addWrappedText('Generated by AI Legal Doc Explainer v8.0.0', 10);
+      addWrappedText('Legal AI System powered by Legal-BERT and Gemini AI', 10);
+      addWrappedText(`Report generated on ${new Date().toLocaleString()}`, 10);
+
+      // Generate PDF blob
+      const pdfBlob = pdf.output('blob');
+      
+      const result = {
+        blob: pdfBlob,
+        filename: `legal_analysis_${document.filename.replace('.pdf', '')}_${new Date().toISOString().split('T')[0]}.pdf`,
+        document_id: documentId,
+        generated_at: now
+      };
+
+      console.log('DocumentService: PDF report generated successfully');
+      return result;
+
+    } catch (error: any) {
+      console.error('DocumentService: PDF report generation failed:', error);
+      throw new Error(`PDF export failed: ${error.message}`);
     }
+  }
+
+  // Helper method to download the PDF
+  downloadPDF(blob: Blob, filename: string): void {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 
   // Batch upload documents

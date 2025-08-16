@@ -9,7 +9,7 @@ export interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ className }) => {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed] = useState(false);
 
   return (
     <div className={cn('min-h-screen bg-pearl-white', className)}>

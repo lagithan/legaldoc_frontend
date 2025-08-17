@@ -8,7 +8,6 @@ import {
   formatTimeAgo,
   getDocumentTypeLabel,
   truncateText,
-  formatConfidenceScore
 } from '../../utils/helpers';
 import type { DocumentListItem } from '../../types/document';
 

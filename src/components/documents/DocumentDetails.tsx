@@ -4,7 +4,6 @@ import {
   Clock,
   Brain,
   AlertTriangle,
-  CheckCircle,
   MessageSquare,
   Download,
   Share,

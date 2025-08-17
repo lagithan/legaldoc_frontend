@@ -2,7 +2,6 @@ import React from 'react';
 import {
   FileText,
   AlertTriangle,
-  Brain,
   Shield,
   BarChart3
 } from 'lucide-react';

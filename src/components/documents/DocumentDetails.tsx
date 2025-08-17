@@ -166,17 +166,7 @@ const DocumentDetails: React.FC<DocumentDetailsProps> = ({
           </div>
         </Card>
 
-        <Card padding="sm">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-black">
-              {Math.round(document.confidence_score * 100)}%
-            </div>
-            <div className="text-sm text-gray-600 mt-1">AI Confidence</div>
-            <div className="mt-2 flex justify-center">
-              <CheckCircle className="w-5 h-5 text-success-green" />
-            </div>
-          </div>
-        </Card>
+        
 
         <Card padding="sm">
           <div className="text-center">

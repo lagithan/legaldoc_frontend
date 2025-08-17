@@ -144,13 +144,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           color="info"
         />
 
-        <StatsCard
-          title="Avg Confidence"
-          value={`${Math.round(analytics.avg_confidence * 100)}%`}
-          description="AI analysis confidence"
-          icon={Brain}
-          color="success"
-        />
+       
 
         <StatsCard
           title="Require Lawyer"

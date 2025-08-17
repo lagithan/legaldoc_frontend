@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'https://legaldocanalyzer-production.up.railway.app';
+export const API_BASE_URL = 'http://localhost:8000';
 
 export const DOCUMENT_TYPES = {
   lease_agreement: 'Lease Agreement',

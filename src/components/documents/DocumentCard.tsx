@@ -87,12 +87,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
         {/* Legal Analysis Info */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-gray-500">AI Confidence:</span>
-            <span className="font-medium text-black">
-              {formatConfidenceScore(document.confidence_score)}
-            </span>
-          </div>
+          
 
           <div className="flex items-center justify-between text-xs">
             <span className="text-gray-500">Legal Terms:</span>
@@ -101,14 +96,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
             </span>
           </div>
 
-          {document.risk_indicators_count > 0 && (
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-gray-500">Risk Indicators:</span>
-              <span className="font-medium text-orange-600">
-                {document.risk_indicators_count} found
-              </span>
-            </div>
-          )}
+          
         </div>
 
         {/* Lawyer Recommendation */}

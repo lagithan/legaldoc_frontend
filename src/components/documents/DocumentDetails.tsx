@@ -15,7 +15,6 @@ import { RiskBadge, LawyerUrgencyBadge } from '../common/Badge';
 import { cn } from '../../utils/cn';
 import {
   getDocumentTypeLabel,
-  formatConfidenceScore,
 } from '../../utils/helpers';
 import type { DocumentResponse } from '../../types/document';
 import ChatAssistant from '../chat/ChatAssistant';
@@ -276,29 +275,7 @@ const DocumentDetails: React.FC<DocumentDetailsProps> = ({
 
         {activeTab === 'analysis' && (
           <>
-            {/* AI Analysis */}
-            <Card>
-              <CardHeader>
-                <CardTitle>AI Confidence & Reasoning</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-                    <div>
-                      <div className="font-medium text-black">
-                        {formatConfidenceScore(document.confidence_score)}
-                      </div>
-                      <div className="text-sm text-gray-600 mt-1">
-                        Analysis Confidence
-                      </div>
-                    </div>
-                    <Brain className="w-8 h-8 text-accent-blue" />
-                  </div>
-
-                  
-                </div>
-              </CardContent>
-            </Card>
+            
 
             {/* Legal Model Analysis */}
             <Card>
